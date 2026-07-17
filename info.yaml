@@ -10,7 +10,7 @@ project:
   clock_hz:     50000000                          # Clock frequency in Hz (if required)
 
   # Since our design needs ~4000 FFs, we require a 2x4 layout.
-  tiles: "2x4" 
+  tiles: "4x2" 
 
   # Top level module name
   top_module:   "tt_um_rv32i"
