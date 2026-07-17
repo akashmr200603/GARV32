@@ -107,24 +107,22 @@ module rv5_pinmux (
     // -----------------------------------------------------------------------
     // Input Multiplexer Function
     // -----------------------------------------------------------------------
-    function automatic bit mux_in;
+    function automatic reg mux_in;
         input [3:0] sel;
-        input [7:0] p_in;
-        input [3:0] p_uio_in;
         begin
             case (sel)
-                4'd0:  mux_in = p_in[0];
-                4'd1:  mux_in = p_in[1];
-                4'd2:  mux_in = p_in[2];
-                4'd3:  mux_in = p_in[3];
-                4'd4:  mux_in = p_in[4];
-                4'd5:  mux_in = p_in[5];
-                4'd6:  mux_in = p_in[6];
-                4'd7:  mux_in = p_in[7];
-                4'd8:  mux_in = p_uio_in[0];
-                4'd9:  mux_in = p_uio_in[1];
-                4'd10: mux_in = p_uio_in[2];
-                4'd11: mux_in = p_uio_in[3];
+                4'd0:  mux_in = pin_in[0];
+                4'd1:  mux_in = pin_in[1];
+                4'd2:  mux_in = pin_in[2];
+                4'd3:  mux_in = pin_in[3];
+                4'd4:  mux_in = pin_in[4];
+                4'd5:  mux_in = pin_in[5];
+                4'd6:  mux_in = pin_in[6];
+                4'd7:  mux_in = pin_in[7];
+                4'd8:  mux_in = pin_uio_in[0];
+                4'd9:  mux_in = pin_uio_in[1];
+                4'd10: mux_in = pin_uio_in[2];
+                4'd11: mux_in = pin_uio_in[3];
                 4'd12: mux_in = 1'b1;
                 4'd13: mux_in = 1'b0;
                 default: mux_in = 1'b0;
@@ -133,32 +131,27 @@ module rv5_pinmux (
     endfunction
 
     always @(*) begin
-        uart0_rx     = mux_in(reg_in_ctrl[3:0],   pin_in, pin_uio_in);
-        uart1_rx     = mux_in(reg_in_ctrl[7:4],   pin_in, pin_uio_in);
-        spi0_miso    = mux_in(reg_in_ctrl[11:8],  pin_in, pin_uio_in);
-        spi1_miso    = mux_in(reg_in_ctrl[15:12], pin_in, pin_uio_in);
-        i2s_sdata_in = mux_in(reg_in_ctrl[19:16], pin_in, pin_uio_in);
+        uart0_rx     = mux_in(reg_in_ctrl[3:0]);
+        uart1_rx     = mux_in(reg_in_ctrl[7:4]);
+        spi0_miso    = mux_in(reg_in_ctrl[11:8]);
+        spi1_miso    = mux_in(reg_in_ctrl[15:12]);
+        i2s_sdata_in = mux_in(reg_in_ctrl[19:16]);
         
-        gpio_in[0]   = mux_in(reg_gpio_in[3:0],   pin_in, pin_uio_in);
-        gpio_in[1]   = mux_in(reg_gpio_in[7:4],   pin_in, pin_uio_in);
-        gpio_in[2]   = mux_in(reg_gpio_in[11:8],  pin_in, pin_uio_in);
-        gpio_in[3]   = mux_in(reg_gpio_in[15:12], pin_in, pin_uio_in);
-        gpio_in[4]   = mux_in(reg_gpio_in[19:16], pin_in, pin_uio_in);
-        gpio_in[5]   = mux_in(reg_gpio_in[23:20], pin_in, pin_uio_in);
-        gpio_in[6]   = mux_in(reg_gpio_in[27:24], pin_in, pin_uio_in);
-        gpio_in[7]   = mux_in(reg_gpio_in[31:28], pin_in, pin_uio_in);
+        gpio_in[0]   = mux_in(reg_gpio_in[3:0]);
+        gpio_in[1]   = mux_in(reg_gpio_in[7:4]);
+        gpio_in[2]   = mux_in(reg_gpio_in[11:8]);
+        gpio_in[3]   = mux_in(reg_gpio_in[15:12]);
+        gpio_in[4]   = mux_in(reg_gpio_in[19:16]);
+        gpio_in[5]   = mux_in(reg_gpio_in[23:20]);
+        gpio_in[6]   = mux_in(reg_gpio_in[27:24]);
+        gpio_in[7]   = mux_in(reg_gpio_in[31:28]);
     end
 
     // -----------------------------------------------------------------------
     // Output Multiplexer Function
     // -----------------------------------------------------------------------
-    function automatic bit mux_out;
+    function automatic reg mux_out;
         input [4:0] sel;
-        // 32 internal signals
-        input uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs;
-        input i2s_sdata_out, i2s_bclk, i2s_lrclk;
-        input [7:0] pwm, gpio;
-        input i2c0_sda, i2c0_scl, i2c1_sda, i2c1_scl;
         begin
             case (sel)
                 5'd0:  mux_out = 1'b0;
@@ -173,50 +166,48 @@ module rv5_pinmux (
                 5'd9:  mux_out = i2s_sdata_out;
                 5'd10: mux_out = i2s_bclk;
                 5'd11: mux_out = i2s_lrclk;
-                5'd12: mux_out = pwm[0];
-                5'd13: mux_out = pwm[1];
-                5'd14: mux_out = pwm[2];
-                5'd15: mux_out = pwm[3];
-                5'd16: mux_out = pwm[4];
-                5'd17: mux_out = pwm[5];
-                5'd18: mux_out = pwm[6];
-                5'd19: mux_out = pwm[7];
-                5'd20: mux_out = gpio[0];
-                5'd21: mux_out = gpio[1];
-                5'd22: mux_out = gpio[2];
-                5'd23: mux_out = gpio[3];
-                5'd24: mux_out = gpio[4];
-                5'd25: mux_out = gpio[5];
-                5'd26: mux_out = gpio[6];
-                5'd27: mux_out = gpio[7];
-                5'd28: mux_out = i2c0_sda;
-                5'd29: mux_out = i2c0_scl;
-                5'd30: mux_out = i2c1_sda;
-                5'd31: mux_out = i2c1_scl;
+                5'd12: mux_out = pwm_out[0];
+                5'd13: mux_out = pwm_out[1];
+                5'd14: mux_out = pwm_out[2];
+                5'd15: mux_out = pwm_out[3];
+                5'd16: mux_out = pwm_out[4];
+                5'd17: mux_out = pwm_out[5];
+                5'd18: mux_out = pwm_out[6];
+                5'd19: mux_out = pwm_out[7];
+                5'd20: mux_out = gpio_out[0];
+                5'd21: mux_out = gpio_out[1];
+                5'd22: mux_out = gpio_out[2];
+                5'd23: mux_out = gpio_out[3];
+                5'd24: mux_out = gpio_out[4];
+                5'd25: mux_out = gpio_out[5];
+                5'd26: mux_out = gpio_out[6];
+                5'd27: mux_out = gpio_out[7];
+                5'd28: mux_out = i2c0_sda_out;
+                5'd29: mux_out = i2c0_scl_out;
+                5'd30: mux_out = i2c1_sda_out;
+                5'd31: mux_out = i2c1_scl_out;
             endcase
         end
     endfunction
 
     always @(*) begin
-        pin_out[0] = mux_out(reg_out_ctrl0[4:0],   uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs, i2s_sdata_out, i2s_bclk, i2s_lrclk, pwm_out, gpio_out, i2c0_sda_out, i2c0_scl_out, i2c1_sda_out, i2c1_scl_out);
-        pin_out[1] = mux_out(reg_out_ctrl0[9:5],   uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs, i2s_sdata_out, i2s_bclk, i2s_lrclk, pwm_out, gpio_out, i2c0_sda_out, i2c0_scl_out, i2c1_sda_out, i2c1_scl_out);
-        pin_out[2] = mux_out(reg_out_ctrl0[14:10], uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs, i2s_sdata_out, i2s_bclk, i2s_lrclk, pwm_out, gpio_out, i2c0_sda_out, i2c0_scl_out, i2c1_sda_out, i2c1_scl_out);
-        pin_out[3] = mux_out(reg_out_ctrl0[19:15], uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs, i2s_sdata_out, i2s_bclk, i2s_lrclk, pwm_out, gpio_out, i2c0_sda_out, i2c0_scl_out, i2c1_sda_out, i2c1_scl_out);
-        pin_out[4] = mux_out(reg_out_ctrl0[24:20], uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs, i2s_sdata_out, i2s_bclk, i2s_lrclk, pwm_out, gpio_out, i2c0_sda_out, i2c0_scl_out, i2c1_sda_out, i2c1_scl_out);
+        pin_out[0] = mux_out(reg_out_ctrl0[4:0]);
+        pin_out[1] = mux_out(reg_out_ctrl0[9:5]);
+        pin_out[2] = mux_out(reg_out_ctrl0[14:10]);
+        pin_out[3] = mux_out(reg_out_ctrl0[19:15]);
+        pin_out[4] = mux_out(reg_out_ctrl0[24:20]);
 
-        pin_uio_out[0] = mux_out(reg_out_ctrl1[4:0],   uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs, i2s_sdata_out, i2s_bclk, i2s_lrclk, pwm_out, gpio_out, i2c0_sda_out, i2c0_scl_out, i2c1_sda_out, i2c1_scl_out);
-        pin_uio_out[1] = mux_out(reg_out_ctrl1[9:5],   uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs, i2s_sdata_out, i2s_bclk, i2s_lrclk, pwm_out, gpio_out, i2c0_sda_out, i2c0_scl_out, i2c1_sda_out, i2c1_scl_out);
-        pin_uio_out[2] = mux_out(reg_out_ctrl1[14:10], uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs, i2s_sdata_out, i2s_bclk, i2s_lrclk, pwm_out, gpio_out, i2c0_sda_out, i2c0_scl_out, i2c1_sda_out, i2c1_scl_out);
-        pin_uio_out[3] = mux_out(reg_out_ctrl1[19:15], uart0_tx, uart1_tx, spi0_mosi, spi0_sck, spi0_cs, spi1_mosi, spi1_sck, spi1_cs, i2s_sdata_out, i2s_bclk, i2s_lrclk, pwm_out, gpio_out, i2c0_sda_out, i2c0_scl_out, i2c1_sda_out, i2c1_scl_out);
+        pin_uio_out[0] = mux_out(reg_out_ctrl1[4:0]);
+        pin_uio_out[1] = mux_out(reg_out_ctrl1[9:5]);
+        pin_uio_out[2] = mux_out(reg_out_ctrl1[14:10]);
+        pin_uio_out[3] = mux_out(reg_out_ctrl1[19:15]);
     end
 
     // -----------------------------------------------------------------------
     // Output Enable (OE) Multiplexer Function for Bidir pins
     // -----------------------------------------------------------------------
-    function automatic bit mux_oe;
+    function automatic reg mux_oe;
         input [3:0] sel;
-        input [7:0] gpio_oe;
-        input i2c0_sda_oe, i2c0_scl_oe, i2c1_sda_oe, i2c1_scl_oe;
         begin
             case (sel)
                 4'd0:  mux_oe = 1'b1; // Always Output
@@ -239,10 +230,10 @@ module rv5_pinmux (
     endfunction
 
     always @(*) begin
-        pin_uio_oe[0] = mux_oe(reg_oe_ctrl[3:0],   gpio_oe, i2c0_sda_oe, i2c0_scl_oe, i2c1_sda_oe, i2c1_scl_oe);
-        pin_uio_oe[1] = mux_oe(reg_oe_ctrl[7:4],   gpio_oe, i2c0_sda_oe, i2c0_scl_oe, i2c1_sda_oe, i2c1_scl_oe);
-        pin_uio_oe[2] = mux_oe(reg_oe_ctrl[11:8],  gpio_oe, i2c0_sda_oe, i2c0_scl_oe, i2c1_sda_oe, i2c1_scl_oe);
-        pin_uio_oe[3] = mux_oe(reg_oe_ctrl[15:12], gpio_oe, i2c0_sda_oe, i2c0_scl_oe, i2c1_sda_oe, i2c1_scl_oe);
+        pin_uio_oe[0] = mux_oe(reg_oe_ctrl[3:0]);
+        pin_uio_oe[1] = mux_oe(reg_oe_ctrl[7:4]);
+        pin_uio_oe[2] = mux_oe(reg_oe_ctrl[11:8]);
+        pin_uio_oe[3] = mux_oe(reg_oe_ctrl[15:12]);
     end
 
 endmodule

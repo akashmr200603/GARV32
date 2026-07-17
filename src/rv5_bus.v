@@ -2,8 +2,7 @@
 // Copyright (c) 2020-2025 RV5 Project Contributors
 
 module rv5_bus #(
-
-  parameter NUM_DEVICES               = 1
+  parameter NUM_DEVICES               = 15
 
   )(
 
