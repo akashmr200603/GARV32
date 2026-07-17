@@ -5,12 +5,12 @@ yaml_version: 6
 project:
   title:        "GARV32"      # Project title
   author:       "Director, CSIR - CEERI (Dr. Gaurav Purohit)"              # Your name
-  description:  "A 32-bit RISC-V SoC with QSPI XIP, 256B SRAM, and interfaces"
+  description:  "A 32-bit RISC-V SoC with QSPI XIP, 64B SRAM, 64B I-Cache, and interfaces"
   language:     "Verilog"                         # e.g., Verilog, SystemVerilog, VHDL, etc.
   clock_hz:     50000000                          # Clock frequency in Hz (if required)
 
-  # Since our design needs ~4000 FFs, we require a 2x2 layout.
-  tiles: "2x2" 
+  # Since our design needs ~4000 FFs, we require a 2x4 layout.
+  tiles: "2x4" 
 
   # Top level module name
   top_module:   "tt_um_rv32i"

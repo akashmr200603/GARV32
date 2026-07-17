@@ -74,14 +74,8 @@ module rv5_pwm #(
         case (rw_address)
           8'h00: prescaler <= write_data;
           8'h04: period <= write_data;
-          8'h10: duty[0] <= write_data;
-          8'h14: duty[1] <= write_data;
-          8'h18: duty[2] <= write_data;
-          8'h1C: duty[3] <= write_data;
-          8'h20: duty[4] <= write_data;
-          8'h24: duty[5] <= write_data;
-          8'h28: duty[6] <= write_data;
-          8'h2C: duty[7] <= write_data;
+          8'h10: if (CHANNELS > 0) duty[0] <= write_data;
+          default: ; // Ignore other addresses
         endcase
       end
       
@@ -89,14 +83,7 @@ module rv5_pwm #(
         case (rw_address)
           8'h00: read_data <= prescaler;
           8'h04: read_data <= period;
-          8'h10: read_data <= duty[0];
-          8'h14: read_data <= duty[1];
-          8'h18: read_data <= duty[2];
-          8'h1C: read_data <= duty[3];
-          8'h20: read_data <= duty[4];
-          8'h24: read_data <= duty[5];
-          8'h28: read_data <= duty[6];
-          8'h2C: read_data <= duty[7];
+          8'h10: if (CHANNELS > 0) read_data <= duty[0];
           default: read_data <= 0;
         endcase
       end

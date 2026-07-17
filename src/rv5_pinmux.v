@@ -25,11 +25,9 @@ module rv5_pinmux (
     output reg         uart0_rx,
     output reg         uart1_rx,
     output reg         spi0_miso,
-    output reg         spi1_miso,
     output reg         i2s_sdata_in,
     output reg  [7:0]  gpio_in,
     output reg         i2c0_sda_in,
-    output reg         i2c1_sda_in,
 
     // Internal Peripheral Outputs (From Peripherals)
     input  wire        uart0_tx,
@@ -37,9 +35,6 @@ module rv5_pinmux (
     input  wire        spi0_mosi,
     input  wire        spi0_sck,
     input  wire        spi0_cs,
-    input  wire        spi1_mosi,
-    input  wire        spi1_sck,
-    input  wire        spi1_cs,
     input  wire        i2s_sdata_out,
     input  wire        i2s_bclk,
     input  wire        i2s_lrclk,
@@ -49,11 +44,7 @@ module rv5_pinmux (
     input  wire        i2c0_sda_out,
     input  wire        i2c0_scl_out,
     input  wire        i2c0_sda_oe,
-    input  wire        i2c0_scl_oe,
-    input  wire        i2c1_sda_out,
-    input  wire        i2c1_scl_out,
-    input  wire        i2c1_sda_oe,
-    input  wire        i2c1_scl_oe
+    input  wire        i2c0_scl_oe
 );
 
     // -----------------------------------------------------------------------
@@ -114,7 +105,7 @@ module rv5_pinmux (
     // -----------------------------------------------------------------------
     // Input Multiplexer Function
     // -----------------------------------------------------------------------
-    function automatic reg mux_in;
+    function automatic mux_in;
         input [3:0] sel;
         begin
             case (sel)
@@ -141,10 +132,10 @@ module rv5_pinmux (
         uart0_rx     = mux_in(reg_in_ctrl[3:0]);
         uart1_rx     = mux_in(reg_in_ctrl[7:4]);
         spi0_miso    = mux_in(reg_in_ctrl[11:8]);
-        spi1_miso    = mux_in(reg_in_ctrl[15:12]);
+        // spi1_miso removed
         i2s_sdata_in = mux_in(reg_in_ctrl[19:16]);
         i2c0_sda_in  = mux_in(reg_in_ctrl1[3:0]);
-        i2c1_sda_in  = mux_in(reg_in_ctrl1[7:4]);
+        // i2c1_sda_in removed
         
         gpio_in[0]   = mux_in(reg_gpio_in[3:0]);
         gpio_in[1]   = mux_in(reg_gpio_in[7:4]);
@@ -159,7 +150,7 @@ module rv5_pinmux (
     // -----------------------------------------------------------------------
     // Output Multiplexer Function
     // -----------------------------------------------------------------------
-    function automatic reg mux_out;
+    function automatic mux_out;
         input [4:0] sel;
         begin
             case (sel)
@@ -169,9 +160,9 @@ module rv5_pinmux (
                 5'd3:  mux_out = spi0_mosi;
                 5'd4:  mux_out = spi0_sck;
                 5'd5:  mux_out = spi0_cs;
-                5'd6:  mux_out = spi1_mosi;
-                5'd7:  mux_out = spi1_sck;
-                5'd8:  mux_out = spi1_cs;
+                5'd6:  mux_out = 1'b0; // spi1_mosi removed
+                5'd7:  mux_out = 1'b0; // spi1_sck removed
+                5'd8:  mux_out = 1'b0; // spi1_cs removed
                 5'd9:  mux_out = i2s_sdata_out;
                 5'd10: mux_out = i2s_bclk;
                 5'd11: mux_out = i2s_lrclk;
@@ -193,8 +184,8 @@ module rv5_pinmux (
                 5'd27: mux_out = gpio_out[7];
                 5'd28: mux_out = i2c0_sda_out;
                 5'd29: mux_out = i2c0_scl_out;
-                5'd30: mux_out = i2c1_sda_out;
-                5'd31: mux_out = i2c1_scl_out;
+                5'd30: mux_out = 1'b0; // i2c1_sda_out removed
+                5'd31: mux_out = 1'b0; // i2c1_scl_out removed
             endcase
         end
     endfunction
@@ -215,7 +206,7 @@ module rv5_pinmux (
     // -----------------------------------------------------------------------
     // Output Enable (OE) Multiplexer Function for Bidir pins
     // -----------------------------------------------------------------------
-    function automatic reg mux_oe;
+    function automatic mux_oe;
         input [3:0] sel;
         begin
             case (sel)
@@ -231,8 +222,8 @@ module rv5_pinmux (
                 4'd9:  mux_oe = gpio_oe[7];
                 4'd10: mux_oe = i2c0_sda_oe;
                 4'd11: mux_oe = i2c0_scl_oe;
-                4'd12: mux_oe = i2c1_sda_oe;
-                4'd13: mux_oe = i2c1_scl_oe;
+                4'd12: mux_oe = 1'b0; // i2c1_sda_oe removed
+                4'd13: mux_oe = 1'b0; // i2c1_scl_oe removed
                 default: mux_oe = 1'b0;
             endcase
         end

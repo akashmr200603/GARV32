@@ -8,17 +8,13 @@ module rv5 #(
   // Desired baud rate for UART unit
   parameter UART_BAUD_RATE = 9600         ,
   // Internal SRAM size in bytes - must be a power of 2
-  parameter MEMORY_SIZE = 256            ,
+  parameter MEMORY_SIZE = 64             ,
   // Address of the first instruction to fetch from memory
   parameter BOOT_ADDRESS = 32'h00000000 ,
-  // Number of available I/O ports
-  parameter GPIO_WIDTH = 1              ,
+  parameter GPIO_WIDTH = 4              ,
   // Number of CS (Chip Select) pins for the SPI controllers
   parameter SPI_NUM_CHIP_SELECT = 1     ,
-  // Desired baud rate for UART1 unit
-  parameter UART1_BAUD_RATE = 9600      ,
-  // Number of CS (Chip Select) pins for the SPI1 controller
-  parameter SPI1_NUM_CHIP_SELECT = 1
+  parameter UART1_BAUD_RATE = 9600
 
   ) (
 
@@ -44,7 +40,7 @@ module rv5 #(
 
   // System bus configuration
 
-  localparam NUM_DEVICES    = 15;
+  localparam NUM_DEVICES    = 13;
   localparam D0_ROM         = 0;
   localparam D1_RAM         = 1;
   localparam D2_UART        = 2;
@@ -52,14 +48,12 @@ module rv5 #(
   localparam D4_GPIO        = 4;
   localparam D5_SPI         = 5;
   localparam D6_UART1       = 6;
-  localparam D7_SPI1        = 7;
-  localparam D8_I2C0        = 8;
-  localparam D9_I2C1        = 9;
-  localparam D10_PWM        = 10;
-  localparam D11_I2S        = 11;
-  localparam D12_QRAM       = 12;
-  localparam D13_HK         = 13;
-  localparam D14_PINMUX     = 14;
+  localparam D7_I2C0        = 7;
+  localparam D8_PWM         = 8;
+  localparam D9_I2S         = 9;
+  localparam D10_QRAM       = 10;
+  localparam D11_HK         = 11;
+  localparam D12_PINMUX     = 12;
 
   wire  [NUM_DEVICES*32-1:0] device_start_address;
   wire  [NUM_DEVICES*32-1:0] device_mask_address;
@@ -67,11 +61,9 @@ module rv5 #(
   // Internal wires for peripherals
   wire uart_rx, uart_tx, uart1_rx, uart1_tx;
   wire [7:0] gpio_input_internal, gpio_oe_internal, gpio_output_internal;
-  wire sclk, pico, poci, sclk1, pico1, poci1;
+  wire sclk, pico, poci;
   wire [SPI_NUM_CHIP_SELECT-1:0] cs;
-  wire [SPI1_NUM_CHIP_SELECT-1:0] cs1;
   wire i2c0_scl_o, i2c0_scl_oe, i2c0_sda_i, i2c0_sda_o, i2c0_sda_oe;
-  wire i2c1_scl_o, i2c1_scl_oe, i2c1_sda_i, i2c1_sda_o, i2c1_sda_oe;
   wire [7:0] pwm_out;
   wire i2s_bclk, i2s_lrclk, i2s_sdata_out, i2s_sdata_in;
 
@@ -97,29 +89,23 @@ module rv5 #(
   assign device_start_address [32*D6_UART1    +: 32]  = 32'h8004_0000;
   assign device_mask_address  [32*D6_UART1    +: 32]  = ~(32'd16 - 1);
 
-  assign device_start_address [32*D7_SPI1     +: 32]  = 32'h8005_0000;
-  assign device_mask_address  [32*D7_SPI1     +: 32]  = ~(32'd32 - 1);
+  assign device_start_address [32*D7_I2C0     +: 32]  = 32'h8006_0000;
+  assign device_mask_address  [32*D7_I2C0     +: 32]  = ~(32'd32 - 1);
 
-  assign device_start_address [32*D8_I2C0     +: 32]  = 32'h8006_0000;
-  assign device_mask_address  [32*D8_I2C0     +: 32]  = ~(32'd32 - 1);
+  assign device_start_address [32*D8_PWM      +: 32]  = 32'h8008_0000;
+  assign device_mask_address  [32*D8_PWM      +: 32]  = ~(32'd64 - 1);
 
-  assign device_start_address [32*D9_I2C1     +: 32]  = 32'h8007_0000;
-  assign device_mask_address  [32*D9_I2C1     +: 32]  = ~(32'd32 - 1);
+  assign device_start_address [32*D9_I2S      +: 32]  = 32'h8009_0000;
+  assign device_mask_address  [32*D9_I2S      +: 32]  = ~(32'd32 - 1);
 
-  assign device_start_address [32*D10_PWM     +: 32]  = 32'h8008_0000;
-  assign device_mask_address  [32*D10_PWM     +: 32]  = ~(32'd64 - 1);
+  assign device_start_address [32*D10_QRAM    +: 32]  = 32'h1000_0000;
+  assign device_mask_address  [32*D10_QRAM    +: 32]  = ~(32'h0080_0000 - 1); // 8MB PSRAM
 
-  assign device_start_address [32*D11_I2S     +: 32]  = 32'h8009_0000;
-  assign device_mask_address  [32*D11_I2S     +: 32]  = ~(32'd32 - 1);
+  assign device_start_address [32*D11_HK      +: 32]  = 32'h800A_0000;
+  assign device_mask_address  [32*D11_HK      +: 32]  = ~(32'd32 - 1);
 
-  assign device_start_address [32*D12_QRAM    +: 32]  = 32'h1000_0000;
-  assign device_mask_address  [32*D12_QRAM    +: 32]  = ~(32'h0080_0000 - 1); // 8MB PSRAM
-
-  assign device_start_address [32*D13_HK      +: 32]  = 32'h800A_0000;
-  assign device_mask_address  [32*D13_HK      +: 32]  = ~(32'd32 - 1);
-
-  assign device_start_address [32*D14_PINMUX  +: 32]  = 32'h800B_0000;
-  assign device_mask_address  [32*D14_PINMUX  +: 32]  = ~(32'd32 - 1);
+  assign device_start_address [32*D12_PINMUX  +: 32]  = 32'h800B_0000;
+  assign device_mask_address  [32*D12_PINMUX  +: 32]  = ~(32'd32 - 1);
 
   // RV5 32-bit Processor (Manager Device) <=> System Bus
 
@@ -150,8 +136,8 @@ module rv5 #(
   assign icache_mem_response  = icache_is_ram ? ram_if_response  : qspi_if_response;
 
   // QSPI memory data bus multiplexing
-  wire qspi_mem_read_request = device_read_request[D0_ROM] | device_read_request[D12_QRAM];
-  wire qspi_mem_write_request = device_write_request[D0_ROM] | device_write_request[D12_QRAM];
+  wire qspi_mem_read_request = device_read_request[D0_ROM] | device_read_request[D10_QRAM];
+  wire qspi_mem_write_request = device_write_request[D0_ROM] | device_write_request[D10_QRAM];
   wire [31:0] qspi_mem_read_data;
   wire qspi_mem_read_response;
   wire qspi_mem_write_response;
@@ -160,9 +146,9 @@ module rv5 #(
   assign device_read_response[D0_ROM] = qspi_mem_read_response & device_read_request[D0_ROM];
   assign device_write_response[D0_ROM] = qspi_mem_write_response & device_write_request[D0_ROM];
 
-  assign device_read_data[32*D12_QRAM +: 32] = qspi_mem_read_data;
-  assign device_read_response[D12_QRAM] = qspi_mem_read_response & device_read_request[D12_QRAM];
-  assign device_write_response[D12_QRAM] = qspi_mem_write_response & device_write_request[D12_QRAM];
+  assign device_read_data[32*D10_QRAM +: 32] = qspi_mem_read_data;
+  assign device_read_response[D10_QRAM] = qspi_mem_read_response & device_read_request[D10_QRAM];
+  assign device_write_response[D10_QRAM] = qspi_mem_write_response & device_write_request[D10_QRAM];
 
   // MEM Interface (Data Memory) -> to System Bus
   wire  [31:0]                manager_mem_address      ;
@@ -309,7 +295,9 @@ module rv5 #(
 
   );
 
-  rv5_icache rv5_icache_instance (
+  rv5_icache #(
+    .CACHE_LINES(16)
+  ) rv5_icache_instance (
     .clock                          (clock                              ),
     .reset                          (reset                              ),
     .core_if_address                (manager_if_address                 ),
@@ -349,13 +337,13 @@ module rv5 #(
     .clock                          (clock                              ),
     .reset                          (reset                              ),
     .rw_address                     (device_rw_address[4:0]             ),
-    .read_data                      (device_read_data[32*D13_HK +: 32]  ),
-    .read_request                   (device_read_request[D13_HK]        ),
-    .read_response                  (device_read_response[D13_HK]       ),
+    .read_data                      (device_read_data[32*D11_HK +: 32]  ),
+    .read_request                   (device_read_request[D11_HK]        ),
+    .read_response                  (device_read_response[D11_HK]       ),
     .write_data                     (device_write_data                  ),
     .write_strobe                   (device_write_strobe                ),
-    .write_request                  (device_write_request[D13_HK]       ),
-    .write_response                 (device_write_response[D13_HK]      )
+    .write_request                  (device_write_request[D11_HK]       ),
+    .write_response                 (device_write_response[D11_HK]      )
   );
 
   rv5_ram #(
@@ -547,40 +535,6 @@ module rv5 #(
 
   );
 
-  // --------------------------------------------------------------------------
-  //  SPI1 Instance
-  // --------------------------------------------------------------------------
-
-  rv5_spi #(
-
-    .SPI_NUM_CHIP_SELECT            (SPI1_NUM_CHIP_SELECT                   )
-
-  ) rv5_spi1_instance (
-
-    // Global signals
-
-    .clock                          (clock                              ),
-    .reset                          (reset                              ),
-
-    // IO interface
-
-    .rw_address                     (device_rw_address[4:0]             ),
-    .read_data                      (device_read_data[32*D7_SPI1 +: 32]),
-    .read_request                   (device_read_request[D7_SPI1]       ),
-    .read_response                  (device_read_response[D7_SPI1]      ),
-    .write_data                     (device_write_data[7:0]             ),
-    .write_strobe                   (device_write_strobe                ),
-    .write_request                  (device_write_request[D7_SPI1]      ),
-    .write_response                 (device_write_response[D7_SPI1]     ),
-
-    // SPI signals
-
-    .sclk                           (sclk1                              ),
-    .pico                           (pico1                              ),
-    .poci                           (poci1                              ),
-    .cs                             (cs1                                )
-
-  );
 
   // --------------------------------------------------------------------------
   //  I2C0 Instance
@@ -596,13 +550,13 @@ module rv5 #(
     // IO interface
 
     .rw_address                     (device_rw_address[4:0]             ),
-    .read_data                      (device_read_data[32*D8_I2C0 +: 32]),
-    .read_request                   (device_read_request[D8_I2C0]       ),
-    .read_response                  (device_read_response[D8_I2C0]      ),
+    .read_data                      (device_read_data[32*D7_I2C0 +: 32]),
+    .read_request                   (device_read_request[D7_I2C0]       ),
+    .read_response                  (device_read_response[D7_I2C0]      ),
     .write_data                     (device_write_data[7:0]             ),
     .write_strobe                   (device_write_strobe                ),
-    .write_request                  (device_write_request[D8_I2C0]      ),
-    .write_response                 (device_write_response[D8_I2C0]     ),
+    .write_request                  (device_write_request[D7_I2C0]      ),
+    .write_response                 (device_write_response[D7_I2C0]     ),
 
     // I2C signals
 
@@ -614,53 +568,22 @@ module rv5 #(
 
   );
 
-  // --------------------------------------------------------------------------
-  //  I2C1 Instance
-  // --------------------------------------------------------------------------
-
-  rv5_i2c rv5_i2c1_instance (
-
-    // Global signals
-
-    .clock                          (clock                              ),
-    .reset                          (reset                              ),
-
-    // IO interface
-
-    .rw_address                     (device_rw_address[4:0]             ),
-    .read_data                      (device_read_data[32*D9_I2C1 +: 32]),
-    .read_request                   (device_read_request[D9_I2C1]       ),
-    .read_response                  (device_read_response[D9_I2C1]      ),
-    .write_data                     (device_write_data[7:0]             ),
-    .write_strobe                   (device_write_strobe                ),
-    .write_request                  (device_write_request[D9_I2C1]      ),
-    .write_response                 (device_write_response[D9_I2C1]     ),
-
-    // I2C signals
-
-    .scl_o                          (i2c1_scl_o                         ),
-    .scl_oe                         (i2c1_scl_oe                        ),
-    .sda_i                          (i2c1_sda_i                         ),
-    .sda_o                          (i2c1_sda_o                         ),
-    .sda_oe                         (i2c1_sda_oe                        )
-
-  );
 
   // --------------------------------------------------------------------------
   //  PWM Instance
   // --------------------------------------------------------------------------
 
-  rv5_pwm #(.CHANNELS(8)) rv5_pwm_instance (
+  rv5_pwm #(.CHANNELS(1)) rv5_pwm_instance (
     .clock                          (clock                              ),
     .reset                          (reset                              ),
     .rw_address                     (device_rw_address[7:0]             ),
-    .read_data                      (device_read_data[32*D10_PWM +: 32]  ),
-    .read_request                   (device_read_request[D10_PWM]        ),
-    .read_response                  (device_read_response[D10_PWM]       ),
+    .read_data                      (device_read_data[32*D8_PWM +: 32]  ),
+    .read_request                   (device_read_request[D8_PWM]        ),
+    .read_response                  (device_read_response[D8_PWM]       ),
     .write_data                     (device_write_data                  ),
     .write_strobe                   (device_write_strobe                ),
-    .write_request                  (device_write_request[D10_PWM]       ),
-    .write_response                 (device_write_response[D10_PWM]      ),
+    .write_request                  (device_write_request[D8_PWM]       ),
+    .write_response                 (device_write_response[D8_PWM]      ),
     .pwm_out                        (pwm_out                            )
   );
 
@@ -672,13 +595,13 @@ module rv5 #(
     .clock                          (clock                              ),
     .reset                          (reset                              ),
     .rw_address                     (device_rw_address[7:0]             ),
-    .read_data                      (device_read_data[32*D11_I2S +: 32] ),
-    .read_request                   (device_read_request[D11_I2S]       ),
-    .read_response                  (device_read_response[D11_I2S]      ),
+    .read_data                      (device_read_data[32*D9_I2S +: 32] ),
+    .read_request                   (device_read_request[D9_I2S]       ),
+    .read_response                  (device_read_response[D9_I2S]      ),
     .write_data                     (device_write_data                  ),
     .write_strobe                   (device_write_strobe                ),
-    .write_request                  (device_write_request[D11_I2S]      ),
-    .write_response                 (device_write_response[D11_I2S]     ),
+    .write_request                  (device_write_request[D9_I2S]      ),
+    .write_response                 (device_write_response[D9_I2S]     ),
     .i2s_bclk                       (i2s_bclk                           ),
     .i2s_lrclk                      (i2s_lrclk                          ),
     .i2s_sdata_out                  (i2s_sdata_out                      ),
@@ -701,17 +624,17 @@ module rv5 #(
   // --------------------------------------------------------------------------
 
   wire pinmux_ack;
-  assign device_read_response[D14_PINMUX]  = pinmux_ack;
-  assign device_write_response[D14_PINMUX] = pinmux_ack;
+  assign device_read_response[D12_PINMUX]  = pinmux_ack;
+  assign device_write_response[D12_PINMUX] = pinmux_ack;
 
   rv5_pinmux rv5_pinmux_instance (
     .clk                            (clock                              ),
     .reset                          (reset                              ),
     .bus_addr                       (device_rw_address                  ),
     .bus_wdata                      (device_write_data                  ),
-    .bus_we                         (device_write_request[D14_PINMUX]   ),
-    .bus_req                        (device_read_request[D14_PINMUX] | device_write_request[D14_PINMUX]),
-    .bus_rdata                      (device_read_data[32*D14_PINMUX +: 32]),
+    .bus_we                         (device_write_request[D12_PINMUX]   ),
+    .bus_req                        (device_read_request[D12_PINMUX] | device_write_request[D12_PINMUX]),
+    .bus_rdata                      (device_read_data[32*D12_PINMUX +: 32]),
     .bus_ack                        (pinmux_ack                         ),
 
     .pin_in                         (pin_in                             ),
@@ -723,20 +646,15 @@ module rv5 #(
     .uart0_rx                       (uart_rx                            ),
     .uart1_rx                       (uart1_rx                           ),
     .spi0_miso                      (poci                               ),
-    .spi1_miso                      (poci1                              ),
     .i2s_sdata_in                   (i2s_sdata_in                       ),
     .gpio_in                        (gpio_input_internal                ),
     .i2c0_sda_in                    (i2c0_sda_i                         ),
-    .i2c1_sda_in                    (i2c1_sda_i                         ),
 
     .uart0_tx                       (uart_tx                            ),
     .uart1_tx                       (uart1_tx                           ),
     .spi0_mosi                      (pico                               ),
     .spi0_sck                       (sclk                               ),
     .spi0_cs                        (cs[0]                              ),
-    .spi1_mosi                      (pico1                              ),
-    .spi1_sck                       (sclk1                              ),
-    .spi1_cs                        (cs1[0]                             ),
     .i2s_sdata_out                  (i2s_sdata_out                      ),
     .i2s_bclk                       (i2s_bclk                           ),
     .i2s_lrclk                      (i2s_lrclk                          ),
@@ -746,11 +664,7 @@ module rv5 #(
     .i2c0_sda_out                   (i2c0_sda_o                         ),
     .i2c0_scl_out                   (i2c0_scl_o                         ),
     .i2c0_sda_oe                    (i2c0_sda_oe                        ),
-    .i2c0_scl_oe                    (i2c0_scl_oe                        ),
-    .i2c1_sda_out                   (i2c1_sda_o                         ),
-    .i2c1_scl_out                   (i2c1_scl_o                         ),
-    .i2c1_sda_oe                    (i2c1_sda_oe                        ),
-    .i2c1_scl_oe                    (i2c1_scl_oe                        )
+    .i2c0_scl_oe                    (i2c0_scl_oe                        )
   );
 
 endmodule

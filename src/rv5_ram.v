@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 // Copyright (c) 2020-2025 RV5 Project Contributors
-// 1KB Register-based SRAM for Tiny Tapeout (no OpenRAM macro needed)
+// 64B Register-based SRAM for Tiny Tapeout (no OpenRAM macro needed)
 
 module rv5_ram #(
-  parameter MEMORY_SIZE = 1024 // 1KB default
+  parameter MEMORY_SIZE = 64 // 64B default
 ) (
   input   wire          clock,
   input   wire          reset,
@@ -30,7 +30,7 @@ module rv5_ram #(
 
   // Synthesizable register-based memory array.
   // Yosys will map this to standard-cell Flip-Flops.
-  // 1KB = 256 words x 32 bits = 8192 Flip-Flops.
+  // 64B = 16 words x 32 bits = 512 Flip-Flops.
   reg [31:0] memory [0:NUM_WORDS-1];
 
   wire [ADDR_WIDTH-1:0] if_word_addr  = if_address[ADDR_WIDTH+1:2];
