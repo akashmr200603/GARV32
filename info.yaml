@@ -1,5 +1,7 @@
 ---
 # Tiny Tapeout project information
+yaml_version: 6
+
 project:
   title:        "GARV32"      # Project title
   author:       "Director, CSIR - CEERI (Dr. Gaurav Purohit)"              # Your name
