@@ -41,6 +41,8 @@ module rv5_bus #(
   );
 
   integer i;
+  
+  wire _unused = &{1'b0, device_start_address, device_mask_address, 1'b0};
 
   reg [NUM_DEVICES-1:0]         device_sel;
   reg [NUM_DEVICES-1:0]         device_sel_save;

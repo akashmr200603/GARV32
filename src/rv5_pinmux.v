@@ -28,6 +28,8 @@ module rv5_pinmux (
     output reg         spi1_miso,
     output reg         i2s_sdata_in,
     output reg  [7:0]  gpio_in,
+    output reg         i2c0_sda_in,
+    output reg         i2c1_sda_in,
 
     // Internal Peripheral Outputs (From Peripherals)
     input  wire        uart0_tx,
@@ -62,12 +64,14 @@ module rv5_pinmux (
     // 0x08: OUT_CTRL1  - [19:0] 5 bits per bidir pin output (pin_uio_out 0 to 3)
     // 0x0C: OE_CTRL    - [15:0] 4 bits per bidir pin OE (pin_uio_oe 0 to 3)
     // 0x10: GPIO_IN    - [31:0] 4 bits per GPIO input (gpio_in 0 to 7)
+    // 0x14: IN_CTRL1   - [7:0] 4 bits per input (I2C0 SDA, I2C1 SDA)
 
     reg [31:0] reg_in_ctrl;
     reg [31:0] reg_out_ctrl0;
     reg [31:0] reg_out_ctrl1;
     reg [31:0] reg_oe_ctrl;
     reg [31:0] reg_gpio_in;
+    reg [31:0] reg_in_ctrl1;
 
     always @(posedge clk) begin
         if (reset) begin
@@ -76,6 +80,7 @@ module rv5_pinmux (
             reg_out_ctrl1 <= 32'h00000000;
             reg_oe_ctrl   <= 32'h00000000;
             reg_gpio_in   <= 32'h00000000;
+            reg_in_ctrl1  <= 32'h00000000;
             bus_ack       <= 1'b0;
             bus_rdata     <= 32'h0;
         end else begin
@@ -89,6 +94,7 @@ module rv5_pinmux (
                         8'h08: reg_out_ctrl1 <= bus_wdata;
                         8'h0C: reg_oe_ctrl   <= bus_wdata;
                         8'h10: reg_gpio_in   <= bus_wdata;
+                        8'h14: reg_in_ctrl1  <= bus_wdata;
                     endcase
                 end else begin
                     case (bus_addr[7:0])
@@ -97,6 +103,7 @@ module rv5_pinmux (
                         8'h08: bus_rdata <= reg_out_ctrl1;
                         8'h0C: bus_rdata <= reg_oe_ctrl;
                         8'h10: bus_rdata <= reg_gpio_in;
+                        8'h14: bus_rdata <= reg_in_ctrl1;
                         default: bus_rdata <= 32'h0;
                     endcase
                 end
@@ -136,6 +143,8 @@ module rv5_pinmux (
         spi0_miso    = mux_in(reg_in_ctrl[11:8]);
         spi1_miso    = mux_in(reg_in_ctrl[15:12]);
         i2s_sdata_in = mux_in(reg_in_ctrl[19:16]);
+        i2c0_sda_in  = mux_in(reg_in_ctrl1[3:0]);
+        i2c1_sda_in  = mux_in(reg_in_ctrl1[7:4]);
         
         gpio_in[0]   = mux_in(reg_gpio_in[3:0]);
         gpio_in[1]   = mux_in(reg_gpio_in[7:4]);

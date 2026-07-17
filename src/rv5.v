@@ -726,6 +726,8 @@ module rv5 #(
     .spi1_miso                      (poci1                              ),
     .i2s_sdata_in                   (i2s_sdata_in                       ),
     .gpio_in                        (gpio_input_internal                ),
+    .i2c0_sda_in                    (i2c0_sda_i                         ),
+    .i2c1_sda_in                    (i2c1_sda_i                         ),
 
     .uart0_tx                       (uart_tx                            ),
     .uart1_tx                       (uart1_tx                           ),
