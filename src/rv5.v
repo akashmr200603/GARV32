@@ -8,7 +8,7 @@ module rv5 #(
   // Desired baud rate for UART unit
   parameter UART_BAUD_RATE = 9600         ,
   // Internal SRAM size in bytes - must be a power of 2
-  parameter MEMORY_SIZE = 256            ,
+  parameter MEMORY_SIZE = 64             ,
   // Address of the first instruction to fetch from memory
   parameter BOOT_ADDRESS = 32'h00000000 ,
   parameter GPIO_WIDTH = 8              ,
@@ -299,7 +299,7 @@ module rv5 #(
   );
 
   rv5_icache #(
-    .CACHE_LINES(64)
+    .CACHE_LINES(16)
   ) rv5_icache_instance (
     .clock                          (clock                              ),
     .reset                          (reset                              ),

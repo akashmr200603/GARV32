@@ -10,7 +10,7 @@ project:
   clock_hz:     50000000                          # Clock frequency in Hz (if required)
 
   # Full peripheral set with Pin Mux — generous tile budget
-  tiles: "12x2" 
+  tiles: "8x2" 
 
   # Top level module name
   top_module:   "tt_um_rv32i"
