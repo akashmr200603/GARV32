@@ -7,7 +7,7 @@ project:
   author:       "Director, CSIR - CEERI (Dr. Gaurav Purohit)"              # Your name
   description:  "A 32-bit RISC-V SoC with QSPI XIP, 256B SRAM, 256B I-Cache, dynamic Pin Mux, and peripherals"
   language:     "Verilog"                         # e.g., Verilog, SystemVerilog, VHDL, etc.
-  clock_hz:     50000000                          # Clock frequency in Hz (if required)
+  clock_hz:     25000000                          # Clock frequency in Hz (if required)
 
   # Full peripheral set with Pin Mux — generous tile budget
   tiles: "8x2" 

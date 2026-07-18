@@ -6,8 +6,8 @@ from cocotb.triggers import ClockCycles
 async def test_project(dut):
     dut._log.info("Starting GARV32 RISC-V SoC Test")
 
-    # Set the clock period to 20 ns (50 MHz) as defined in info.yaml
-    clock = Clock(dut.clk, 20, units="ns")
+    # Set the clock period to 40 ns (25 MHz) as defined in info.yaml
+    clock = Clock(dut.clk, 40, units="ns")
     cocotb.start_soon(clock.start())
 
     # Initialize inputs
