@@ -85,9 +85,7 @@ module rv5_bus #(
         4'h4: device_sel[6]  = 1'b1; // UART1   @ 0x8004_0000
         4'h6: device_sel[7]  = 1'b1; // I2C0    @ 0x8006_0000
         4'h8: device_sel[8]  = 1'b1; // PWM     @ 0x8008_0000
-        4'h9: device_sel[9]  = 1'b1; // I2S     @ 0x8009_0000
-        4'hA: device_sel[11] = 1'b1; // HK      @ 0x800A_0000
-        4'hB: device_sel[12] = 1'b1; // PINMUX  @ 0x800B_0000
+        4'hA: device_sel[10] = 1'b1; // HK      @ 0x800A_0000
         default: ; // no device
       endcase
     end

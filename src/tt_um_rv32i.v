@@ -60,20 +60,58 @@ module tt_um_rv32i (
   assign qspi_io_in   = uio_in[3:0];
 
   // -------------------------------------------------------------------------
-  // Pin Mux (Dynamic Pins)
+  // Hardwired Peripherals
   // -------------------------------------------------------------------------
-  wire [7:0] pin_in  = ui_in[7:0];
-  wire [4:0] pin_out;
-  
-  wire [3:0] pin_uio_in = uio_in[7:4];
-  wire [3:0] pin_uio_out;
-  wire [3:0] pin_uio_oe;
 
-  assign uo_out[0]   = pin_out[0];
-  assign uo_out[7:4] = pin_out[4:1];
+  // UART0
+  wire uart0_rx = ui_in[0];
+  wire uart0_tx;
+  assign uo_out[0] = uart0_tx;
+
+  // UART1
+  wire uart1_rx = ui_in[1];
+  wire uart1_tx;
+  assign uo_out[4] = uart1_tx;
+
+  // SPI0
+  wire spi0_miso = ui_in[2];
+  wire spi0_mosi;
+  wire spi0_sck;
+  wire spi0_cs;
+  assign uo_out[5] = spi0_sck;
+  assign uo_out[6] = spi0_mosi;
+  assign uo_out[7] = spi0_cs;
+
+  // I2C0
+  wire i2c0_sda_i = uio_in[4];
+  wire i2c0_sda_o;
+  wire i2c0_sda_oe;
+  assign uio_out[4] = i2c0_sda_o;
+  assign uio_oe[4]  = i2c0_sda_oe;
+
+  wire i2c0_scl_i = uio_in[5];
+  wire i2c0_scl_o;
+  wire i2c0_scl_oe;
+  assign uio_out[5] = i2c0_scl_o;
+  assign uio_oe[5]  = i2c0_scl_oe;
+
+  // PWM
+  wire [7:0] pwm_out;
+  assign uio_out[6] = pwm_out[0];
+  assign uio_oe[6]  = 1'b1; // Force bidir as output
+
+  // GPIO
+  wire [3:0] gpio_in;
+  wire [3:0] gpio_out;
+  wire [3:0] gpio_oe;
+
+  assign gpio_in[0] = ui_in[3];
+  assign gpio_in[1] = ui_in[4];
+  assign gpio_in[2] = ui_in[5];
+  assign gpio_in[3] = uio_in[7];
   
-  assign uio_out[7:4] = pin_uio_out;
-  assign uio_oe[7:4]  = pin_uio_oe;
+  assign uio_out[7] = gpio_out[3];
+  assign uio_oe[7]  = gpio_oe[3];
 
   // -------------------------------------------------------------------------
   // RV5 SoC Instance
@@ -91,12 +129,25 @@ module tt_um_rv32i (
     .reset       (reset_sync),
     .halt        (1'b0),
 
-    // Pin Mux Interface
-    .pin_in      (pin_in),
-    .pin_out     (pin_out),
-    .pin_uio_in  (pin_uio_in),
-    .pin_uio_out (pin_uio_out),
-    .pin_uio_oe  (pin_uio_oe),
+    // Hardwired Interface
+    .uart_rx        (uart0_rx),
+    .uart_tx        (uart0_tx),
+    .uart1_rx       (uart1_rx),
+    .uart1_tx       (uart1_tx),
+    .poci           (spi0_miso),
+    .pico           (spi0_mosi),
+    .sclk           (spi0_sck),
+    .cs             (spi0_cs),
+    .gpio_input_internal (gpio_in),
+    .gpio_output_internal(gpio_out),
+    .gpio_oe_internal    (gpio_oe),
+    .i2c0_sda_i     (i2c0_sda_i),
+    .i2c0_sda_o     (i2c0_sda_o),
+    .i2c0_sda_oe    (i2c0_sda_oe),
+    .i2c0_scl_i     (i2c0_scl_i),
+    .i2c0_scl_o     (i2c0_scl_o),
+    .i2c0_scl_oe    (i2c0_scl_oe),
+    .pwm_out        (pwm_out),
 
     // QSPI (directly routed to pads)
     .qspi_sck      (qspi_sck),
