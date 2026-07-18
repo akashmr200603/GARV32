@@ -1,6 +1,6 @@
 // SPDX-License-Identifier: MIT
 module rv5_icache #(
-  parameter CACHE_LINES = 4 // 4 words * 4 bytes = 16 bytes I-Cache
+  parameter CACHE_LINES = 64 // 64 words * 4 bytes = 256 bytes I-Cache
 )(
   input  wire        clock,
   input  wire        reset,

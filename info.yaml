@@ -5,12 +5,12 @@ yaml_version: 6
 project:
   title:        "GARV32"      # Project title
   author:       "Director, CSIR - CEERI (Dr. Gaurav Purohit)"              # Your name
-  description:  "A 32-bit RISC-V SoC with QSPI XIP, 64B SRAM, 16B I-Cache, and interfaces"
+  description:  "A 32-bit RISC-V SoC with QSPI XIP, 256B SRAM, 256B I-Cache, dynamic Pin Mux, and peripherals"
   language:     "Verilog"                         # e.g., Verilog, SystemVerilog, VHDL, etc.
   clock_hz:     50000000                          # Clock frequency in Hz (if required)
 
-  # Since our design has ~25000 cells, we require an 8x2 layout (16 tiles).
-  tiles: "3x3" 
+  # Full peripheral set with Pin Mux — generous tile budget
+  tiles: "12x2" 
 
   # Top level module name
   top_module:   "tt_um_rv32i"
@@ -24,8 +24,10 @@ project:
     - "rv5_gpio.v"
     - "rv5_housekeeping.v"
     - "rv5_i2c.v"
+    - "rv5_i2s.v"
     - "rv5_icache.v"
     - "rv5_mtimer.v"
+    - "rv5_pinmux.v"
     - "rv5_por.v"
     - "rv5_pwm.v"
     - "rv5_qspi.v"
@@ -36,31 +38,31 @@ project:
 # Pinout mapping
 pinout:
   # Inputs (Dedicated)
-  ui[0]: "UART0 RX"
-  ui[1]: "UART1 RX"
-  ui[2]: "SPI0 MISO"
-  ui[3]: "GPIO IN 0"
-  ui[4]: "GPIO IN 1"
-  ui[5]: "GPIO IN 2"
-  ui[6]: "Unused"
-  ui[7]: "Unused"
+  ui[0]: "Dynamic Pin Mux Input 0"
+  ui[1]: "Dynamic Pin Mux Input 1"
+  ui[2]: "Dynamic Pin Mux Input 2"
+  ui[3]: "Dynamic Pin Mux Input 3"
+  ui[4]: "Dynamic Pin Mux Input 4"
+  ui[5]: "Dynamic Pin Mux Input 5"
+  ui[6]: "Dynamic Pin Mux Input 6"
+  ui[7]: "Dynamic Pin Mux Input 7"
 
   # Outputs (Dedicated)
-  uo[0]: "UART0 TX"
+  uo[0]: "Dynamic Pin Mux Output 0"
   uo[1]: "QSPI Serial Clock (Hardwired)"
   uo[2]: "QSPI Flash CS (Hardwired)"
   uo[3]: "QSPI PSRAM CS (Hardwired)"
-  uo[4]: "UART1 TX"
-  uo[5]: "SPI0 SCK"
-  uo[6]: "SPI0 MOSI"
-  uo[7]: "SPI0 CS"
+  uo[4]: "Dynamic Pin Mux Output 1"
+  uo[5]: "Dynamic Pin Mux Output 2"
+  uo[6]: "Dynamic Pin Mux Output 3"
+  uo[7]: "Dynamic Pin Mux Output 4"
 
   # Bidirectional (IOs)
   uio[0]: "QSPI Data IO 0 (Hardwired)"
   uio[1]: "QSPI Data IO 1 (Hardwired)"
   uio[2]: "QSPI Data IO 2 (Hardwired)"
   uio[3]: "QSPI Data IO 3 (Hardwired)"
-  uio[4]: "I2C0 SDA"
-  uio[5]: "I2C0 SCL"
-  uio[6]: "PWM OUT"
-  uio[7]: "GPIO Bidir 3"
+  uio[4]: "Dynamic Pin Mux Bidir 0"
+  uio[5]: "Dynamic Pin Mux Bidir 1"
+  uio[6]: "Dynamic Pin Mux Bidir 2"
+  uio[7]: "Dynamic Pin Mux Bidir 3"
