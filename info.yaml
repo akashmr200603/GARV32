@@ -10,7 +10,7 @@ project:
   clock_hz:     50000000                          # Clock frequency in Hz (if required)
 
   # Since our design has ~25000 cells, we require an 8x2 layout (16 tiles).
-  tiles: "4x2" 
+  tiles: "3x3" 
 
   # Top level module name
   top_module:   "tt_um_rv32i"
