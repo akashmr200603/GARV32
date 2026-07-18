@@ -81,7 +81,7 @@ module tt_um_rv32i (
   rv5 #(
     .CLOCK_FREQUENCY     (50000000),
     .UART_BAUD_RATE      (9600),
-    .MEMORY_SIZE         (256),
+    .MEMORY_SIZE         (64),
     .BOOT_ADDRESS        (32'h00000000),
     .GPIO_WIDTH          (8),
     .SPI_NUM_CHIP_SELECT (1),
