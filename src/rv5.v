@@ -299,7 +299,7 @@ module rv5 #(
   );
 
   rv5_icache #(
-    .CACHE_LINES(16)
+    .CACHE_LINES(4)
   ) rv5_icache_instance (
     .clock                          (clock                              ),
     .reset                          (reset                              ),
@@ -487,6 +487,7 @@ module rv5 #(
   wire        i2c0_scl_o;
   wire        i2c0_scl_oe;
   wire [7:0]  pwm_out;
+  wire [3:0]  pwm_out_internal;
   wire        i2s_bclk;
   wire        i2s_lrclk;
   wire        i2s_sdata_out;
@@ -599,7 +600,7 @@ module rv5 #(
   //  PWM Instance
   // --------------------------------------------------------------------------
 
-  rv5_pwm #(.CHANNELS(8)) rv5_pwm_instance (
+  rv5_pwm #(.CHANNELS(4)) rv5_pwm_instance (
     .clock                          (clock                              ),
     .reset                          (reset                              ),
     .rw_address                     (device_rw_address[7:0]             ),
@@ -610,8 +611,10 @@ module rv5 #(
     .write_strobe                   (device_write_strobe                ),
     .write_request                  (device_write_request[D8_PWM]       ),
     .write_response                 (device_write_response[D8_PWM]      ),
-    .pwm_out                        (pwm_out                            )
+    .pwm_out                        (pwm_out_internal                   )
   );
+
+  assign pwm_out = {4'b0, pwm_out_internal};
 
   // --------------------------------------------------------------------------
   //  I2S Instance
