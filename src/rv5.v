@@ -663,6 +663,7 @@ module rv5 #(
     .spi0_miso                      (poci                               ),
     .spi1_miso                      (                                   ),
     .i2s_sdata_in                   (i2s_sdata_in                       ),
+    .i2c0_sda_in                    (i2c0_sda_i                         ),
     .gpio_in                        (gpio_input_internal                ),
 
     // Internal Peripheral Outputs

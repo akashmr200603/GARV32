@@ -27,6 +27,7 @@ module rv5_pinmux (
     output reg         spi0_miso,
     output reg         spi1_miso,
     output reg         i2s_sdata_in,
+    output reg         i2c0_sda_in,
     output reg  [7:0]  gpio_in,
 
     // Internal Peripheral Outputs (From Peripherals)
@@ -138,6 +139,7 @@ module rv5_pinmux (
         spi0_miso    = mux_in(reg_in_ctrl[11:8],  pin_in, pin_uio_in);
         spi1_miso    = mux_in(reg_in_ctrl[15:12], pin_in, pin_uio_in);
         i2s_sdata_in = mux_in(reg_in_ctrl[19:16], pin_in, pin_uio_in);
+        i2c0_sda_in  = mux_in(reg_in_ctrl[23:20], pin_in, pin_uio_in);
         
         gpio_in[0]   = mux_in(reg_gpio_in[3:0],   pin_in, pin_uio_in);
         gpio_in[1]   = mux_in(reg_gpio_in[7:4],   pin_in, pin_uio_in);
